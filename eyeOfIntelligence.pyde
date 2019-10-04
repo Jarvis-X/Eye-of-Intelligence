@@ -1,8 +1,5 @@
-import main
-
-
 # Macro for minimum number: numbers smaller than this is 0
-epsil = 0.01
+epsil = 0.001
 
 # Macros for races
 HUMAN = 1
@@ -17,27 +14,31 @@ POLIC = 11    # one police
 POLIC_2 = 12  # two police
 POLIC_3 = 13  # three police
 
-
 # Macro for no modification:
 NO_MOD = 0
 
 # Macros for _consist_modifier
 CONSIST_MODIFIER = 100
 AUTO_CLEAR = 101
-
+DECADE = 102
+STICKY = 103
 
 # Macros for _mov_modifier
 MOV_MODIFIER = 200
-
+INERTIA = 201
 
 # Macros for items
 ITEMS = 300
 MONUMENT_STONE = 301
 
-
 # Macros for buffs
 BUFFS = 600
 LEARNING = 601
+TOLERATE = 602
+
+# Macros for special modifier
+SPECIAL_MODIFIER = 1000
+CHARGE = 1001
 
 
 # class def for a character
@@ -75,8 +76,7 @@ class Character:
         
     it contains public methods:
         
-    TODO: add implementations for other races
-    
+    TODO: MRIFT, MECHA, SWARM
     """
     def __init__(self, race, name = "John_Wick", is_player = False):
         self._race = race
@@ -90,34 +90,69 @@ class Character:
         self._mag_attack_modifier = NO_MOD
         self._mag_defend_modifier = NO_MOD
         self._act_point_modifier = NO_MOD
-        self._mov_modifier = NO_MOD
+        
+        # common values
+        self._full_hp = 10
+        self._phy_attack = 10
+        self._phy_defend = 10
+        self._mag_attack = 10
+        self._mag_defend = 10
+        self._act_point = 10
+        self._item_slot = 5
+        self._inventory_slot = 10
+        
+        # traits, buffs, items, etc.
+        self._consist_modifier = set()
+        self._inventory = set()
+        self._item_equipped = set()
+        self._buff_possessed = set()
+        self._special = set()
         
         # human character
         if self._race == HUMAN:
-            self._full_hp = 10
-            self._phy_attack = 10
-            self._phy_defend = 15
-            self._mag_attack = 10
-            self._mag_defend = 10
-            self._act_point = 12
-            self._item_slot = 5
-            self._inventory_slot = 10
+            self._phy_defend += 5
+            self._act_point += 2
             
-            self._consist_modifier = set()
-            self._inventory = set()
-            self._item_equipped = set()
-            self._buff_possessed = set()
-            self._special = set()
-            
-            self._consist_modifier.add(AUTO_CLEAR)  # human's racial trait
-            self._item_equipped.add(LEARNING)       # human's racial trait
+            self._consist_modifier.add(AUTO_CLEAR)
+            self._item_equipped.add(MONUMENT_STONE)
+            self._buff_possessed.add(LEARNING)
             
             self._phy_attack_modifier += self._phy_attack*0.1
             self._phy_defend_modifier += self._phy_defend*0.1
             self._mag_attack_modifier += self._mag_attack*0.1
             self._mag_defend_modifier += self._mag_defend*0.1
+        # solar sun character
+        elif self._race == SOLAR:
+            self._phy_attack += 5
+            self._mag_attack += 5
+            self._full_hp -= 5
+            self._mag_defend -= 5
+            self._act_point -= 5
+            self._mov_modifier = INERTIA
             
-            
-if __name__ == "__main__":
-    humanA = Character(HUMAN)
+            self._consist_modifier.add(DECADE)
+            self._consist_modifier.add(STICKY)
+            self._buff_possessed.add(TOLERATE)
+            self._special.add(CHARGE)
+    
+    def getName(self):
+        return self._name
+    
+    def getRace(self):
+        return self._race
+
+    
+# placeholder for the battle function
+def battle(A, B):
+    textSize(32);
+    text("{} beats {} and wins!".format(A.getName(), B.getName()), 10, 30); 
+
+
+
+# main function
+size(1280, 720)
+humanA = Character(HUMAN, "Feiyangyang", True)
+solarA = Character(SOLAR, "Meiyangyang")
+battle(humanA, solarA)
+print("All Good")
     
